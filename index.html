@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OlahragaYuk - Platform Olahraga Terlengkap Indonesia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .sport-icon {
+            font-size: 2rem;
+        }
+        
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+        }
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Loading animation */
+        .loading {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Payment method selection */
+        input[type="radio"]:checked + div {
+            background-color: #f0f9ff;
+            border-color: #3b82f6;
+        }
+        
+        /* Live Score Animation */
+        .live-pulse {
+            animation: livePulse 2s infinite;
+        }
+        
+        @keyframes livePulse {
+            0%, 100% { 
+                background-color: #fee2e2;
+                border-color: #fca5a5;
+            }
+            50% { 
+                background-color: #fef2f2;
+                border-color: #f87171;
+            }
+        }
+        
+        /* Match Schedule Styles */
+        .match-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .match-card.live {
+            border-left-color: #ef4444;
+            background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%);
+        }
+        
+        .match-card.upcoming {
+            border-left-color: #3b82f6;
+        }
+        
+        .match-card.finished {
+            border-left-color: #10b981;
+        }
+        
+        /* Responsive grid improvements */
+        @media (max-width: 768px) {
+            .mobile-nav {
+                display: block;
+            }
+            
+            .desktop-nav {
+                display: none;
+            }
+            
+            .grid-responsive {
+                grid-template-columns: 1fr;
+            }
+            
+            .text-responsive {
+                font-size: 1.5rem;
+            }
+            
+            .card-mobile {
+                margin-bottom: 1rem;
+            }
+            
+            .modal-mobile {
+                margin: 1rem;
+                max-height: calc(100vh - 2rem);
+            }
+        }
+        
+        /* Enhanced animations */
+        .slide-in-right {
+            animation: slideInRight 0.5s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .bounce-in {
+            animation: bounceIn 0.6s ease-out;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Glassmorphism effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        /* Improved button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Enhanced form styles */
+        .form-input {
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 500;
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .notification.info {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+        
+        /* Mobile-first responsive design */
+        @media (min-width: 640px) {
+            .sm\:grid-cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-3 {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+            
+            .lg\:grid-cols-4 {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+        
+        /* Calendar styles */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #e5e7eb;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .calendar-day {
+            background: white;
+            padding: 0.5rem;
+            min-height: 80px;
+            position: relative;
+        }
+        
+        .calendar-day.has-match {
+            background: #fef3c7;
+        }
+        
+        .match-indicator {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            right: 2px;
+            font-size: 0.6rem;
+            background: #3b82f6;
+            color: white;
+            padding: 1px 2px;
+            border-radius: 2px;
+            text-align: center;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold">🏆 OlahragaYuk</h1>
+                </div>
+                <div class="hidden md:block desktop-nav">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <button onclick="showSection('dashboard')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Dashboard</button>
+                        <button onclick="showSection('events')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Event</button>
+                        <button onclick="showSection('booking')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Booking</button>
+                        <button onclick="showSection('news')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Berita</button>
+                        <button onclick="showSection('livescore')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Live Score</button>
+                        <button onclick="showSection('schedule')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Jadwal</button>
+                        <button onclick="showSection('analytics')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Analytics</button>
+                        <button onclick="showSection('profile')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Profile</button>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-white hover:bg-white hover:bg-opacity-20 p-2 rounded-md transition-colors">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="userGreeting" class="text-sm">Selamat datang!</span>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-md text-sm font-medium transition-colors">Logout</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white bg-opacity-10 backdrop-blur-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <button onclick="showSection('dashboard'); toggleMobileMenu()" class="mobile-nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white hover:bg-opacity-20 transition-colors">📊 Dashboard</button>
+                <button onclick="showSection('events'); toggleMobileMenu()" class="mobile-nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white hover:bg-opacity-20 transition-colors">🏆 Event</button>
+                <button onclick="showSection('booking'); toggleMobileMenu()" class="mobile-nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white hover:bg-opacity-20 transition-colors">🏟️ Booking</button>
+                <button onclick="showSection('news'); toggleMobileMenu()" class="mobile-nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white hover:bg-opacity-20 transition-colors">📰 Berita</button>
+                <button onclick="showSection('livescore'); toggleMobileMenu()" class="mobile-nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white hover:bg-opacity-20 transition-colors">🔴 Live Score</button>
+                <button onclick="showSection('schedule'); toggleMobileMenu()" class="mobile-nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white hover:bg-opacity-20 transition-colors">📅 Jadwal</button>
+                <button onclick="showSection('analytics'); toggleMobileMenu()" class="mobile-nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white hover:bg-opacity-20 transition-colors">📈 Analytics</button>
+                <button onclick="showSection('profile'); toggleMobileMenu()" class="mobile-nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white hover:bg-opacity-20 transition-colors">👤 Profile</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Section -->
+    <div id="loginSection" class="min-h-screen flex items-center justify-center gradient-bg">
+        <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-2xl">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-gray-900">🏆 OlahragaYuk</h2>
+                <p class="mt-2 text-gray-600">Masuk ke akun Anda</p>
+            </div>
+            <form onsubmit="login(event)" class="mt-8 space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="loginEmail" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="loginPassword" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="flex items-center justify-between">
+                    <button type="button" onclick="showForgotPassword()" class="text-sm text-blue-600 hover:text-blue-500">Lupa password?</button>
+                </div>
+                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    Masuk
+                </button>
+                <div class="text-center">
+                    <button type="button" onclick="showRegister()" class="text-sm text-blue-600 hover:text-blue-500">Belum punya akun? Daftar di OlahragaYuk</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Section -->
+    <div id="registerSection" class="hidden min-h-screen flex items-center justify-center gradient-bg">
+        <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-2xl">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-gray-900">Daftar Akun Baru</h2>
+                <p class="mt-2 text-gray-600">Bergabung dengan OlahragaYuk</p>
+            </div>
+            <form onsubmit="register(event)" class="mt-8 space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
+                    <input type="text" id="registerName" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="registerEmail" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nomor Telepon</label>
+                    <input type="tel" id="registerPhone" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="registerPassword" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Konfirmasi Password</label>
+                    <input type="password" id="registerConfirmPassword" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+                    Daftar
+                </button>
+                <div class="text-center">
+                    <button type="button" onclick="showLogin()" class="text-sm text-blue-600 hover:text-blue-500">Sudah punya akun? Masuk di sini</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Forgot Password Section -->
+    <div id="forgotPasswordSection" class="hidden min-h-screen flex items-center justify-center gradient-bg">
+        <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-2xl">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-gray-900">Reset Password</h2>
+                <p class="mt-2 text-gray-600">Masukkan email untuk reset password</p>
+            </div>
+            <form onsubmit="forgotPassword(event)" class="mt-8 space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="forgotEmail" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors">
+                    Kirim Link Reset
+                </button>
+                <div class="text-center">
+                    <button type="button" onclick="showLogin()" class="text-sm text-blue-600 hover:text-blue-500">Kembali ke login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App Content -->
+    <div id="mainApp" class="hidden">
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Dashboard OlahragaYuk</h2>
+                <p class="text-gray-600">Selamat datang di platform olahraga terlengkap Indonesia</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                            <span class="sport-icon">📅</span>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Total Event</p>
+                            <p class="text-2xl font-bold text-gray-900" id="totalEvents">45</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600">
+                            <span class="sport-icon">🏟️</span>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Booking Aktif</p>
+                            <p class="text-2xl font-bold text-gray-900" id="activeBookings">28</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                            <span class="sport-icon">📰</span>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Berita Terbaru</p>
+                            <p class="text-2xl font-bold text-gray-900" id="totalNews">156</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-red-100 text-red-600">
+                            <span class="sport-icon">🔴</span>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Live Matches</p>
+                            <p class="text-2xl font-bold text-gray-900" id="liveMatches">12</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Scores Widget -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">🔴 Live Score Hari Ini</h3>
+                <div id="dashboardLiveScores" class="space-y-3">
+                    <!-- Live scores will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">🏃‍♂️ Event Mendatang</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-medium">Jakarta Marathon 2025</p>
+                                <p class="text-sm text-gray-600">15 Februari 2025</p>
+                            </div>
+                            <span class="text-green-600 font-medium">Open</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-medium">Indonesia Open Badminton</p>
+                                <p class="text-sm text-gray-600">15 Juni 2025</p>
+                            </div>
+                            <span class="text-blue-600 font-medium">Tersedia</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">🏟️ Booking Terbaru</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-medium">Padel Court Senayan</p>
+                                <p class="text-sm text-gray-600">Hari ini, 19:00</p>
+                            </div>
+                            <span class="text-green-600 font-medium">Aktif</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-medium">Futsal Arena A</p>
+                                <p class="text-sm text-gray-600">Besok, 16:00</p>
+                            </div>
+                            <span class="text-orange-600 font-medium">Pending</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">📰 Berita Trending</h3>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-gray-50 rounded-lg">
+                            <p class="font-medium text-sm">Indonesia Dominasi SEA Games 2025</p>
+                            <p class="text-xs text-gray-600 mt-1">2 jam yang lalu</p>
+                        </div>
+                        <div class="p-3 bg-gray-50 rounded-lg">
+                            <p class="font-medium text-sm">Liga 1 2025 Pecahkan Rekor Penonton</p>
+                            <p class="text-xs text-gray-600 mt-1">5 jam yang lalu</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Section -->
+        <div id="eventsSection" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Event Olahraga</h2>
+                <p class="text-gray-600">Temukan dan ikuti event olahraga terbaik di Indonesia</p>
+            </div>
+
+            <!-- Event Categories -->
+            <div class="mb-6">
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterEvents('all')" class="event-filter-btn bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition-colors">Semua</button>
+                    <button onclick="filterEvents('lari')" class="event-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">🏃‍♂️ Lari</button>
+                    <button onclick="filterEvents('sepeda')" class="event-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">🚴‍♂️ Sepeda</button>
+                    <button onclick="filterEvents('renang')" class="event-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">🏊‍♂️ Renang</button>
+                    <button onclick="filterEvents('sepakbola')" class="event-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">⚽ Sepakbola</button>
+                    <button onclick="filterEvents('badminton')" class="event-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">🏸 Badminton</button>
+                </div>
+            </div>
+
+            <!-- Add Event Button -->
+            <div class="mb-6">
+                <button onclick="showAddEventModal()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    ➕ Tambah Event Baru
+                </button>
+            </div>
+
+            <!-- Events Grid -->
+            <div id="eventsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Events will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Booking Section -->
+        <div id="bookingSection" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Booking Lapangan</h2>
+                <p class="text-gray-600">Pesan lapangan olahraga favorit Anda dengan mudah</p>
+            </div>
+
+            <!-- Sport Categories -->
+            <div class="mb-6">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <button onclick="selectSport('futsal')" class="sport-btn p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-all text-center border-2 border-transparent hover:border-blue-500">
+                        <div class="text-3xl mb-2">⚽</div>
+                        <div class="font-medium">Futsal</div>
+                    </button>
+                    <button onclick="selectSport('badminton')" class="sport-btn p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-all text-center border-2 border-transparent hover:border-blue-500">
+                        <div class="text-3xl mb-2">🏸</div>
+                        <div class="font-medium">Badminton</div>
+                    </button>
+                    <button onclick="selectSport('basket')" class="sport-btn p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-all text-center border-2 border-transparent hover:border-blue-500">
+                        <div class="text-3xl mb-2">🏀</div>
+                        <div class="font-medium">Basket</div>
+                    </button>
+                    <button onclick="selectSport('tenis')" class="sport-btn p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-all text-center border-2 border-transparent hover:border-blue-500">
+                        <div class="text-3xl mb-2">🎾</div>
+                        <div class="font-medium">Tenis</div>
+                    </button>
+                    <button onclick="selectSport('voli')" class="sport-btn p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-all text-center border-2 border-transparent hover:border-blue-500">
+                        <div class="text-3xl mb-2">🏐</div>
+                        <div class="font-medium">Voli</div>
+                    </button>
+                    <button onclick="selectSport('padel')" class="sport-btn p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-all text-center border-2 border-transparent hover:border-blue-500">
+                        <div class="text-3xl mb-2">🎾</div>
+                        <div class="font-medium">Padel</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Booking Form -->
+            <div id="bookingForm" class="hidden bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Booking <span id="selectedSportName"></span></h3>
+                <form onsubmit="submitBooking(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Lapangan</label>
+                            <select id="fieldSelect" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Pilih lapangan...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal</label>
+                            <input type="date" id="bookingDate" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Waktu Mulai</label>
+                            <select id="startTime" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Pilih waktu...</option>
+                                <option value="06:00">06:00</option>
+                                <option value="07:00">07:00</option>
+                                <option value="08:00">08:00</option>
+                                <option value="09:00">09:00</option>
+                                <option value="10:00">10:00</option>
+                                <option value="11:00">11:00</option>
+                                <option value="12:00">12:00</option>
+                                <option value="13:00">13:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="15:00">15:00</option>
+                                <option value="16:00">16:00</option>
+                                <option value="17:00">17:00</option>
+                                <option value="18:00">18:00</option>
+                                <option value="19:00">19:00</option>
+                                <option value="20:00">20:00</option>
+                                <option value="21:00">21:00</option>
+                                <option value="22:00">22:00</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Durasi (jam)</label>
+                            <select id="duration" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Pilih durasi...</option>
+                                <option value="1">1 jam</option>
+                                <option value="2">2 jam</option>
+                                <option value="3">3 jam</option>
+                                <option value="4">4 jam</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Field Details -->
+                    <div id="fieldDetails" class="hidden mt-4 p-4 bg-gray-50 rounded-lg">
+                        <h4 class="font-semibold text-gray-900 mb-2">Detail Lapangan</h4>
+                        <div id="fieldInfo"></div>
+                    </div>
+                    
+                    <!-- Price Calculation -->
+                    <div id="priceCalculation" class="hidden mt-4 p-4 bg-blue-50 rounded-lg">
+                        <h4 class="font-semibold text-blue-900 mb-2">Rincian Harga</h4>
+                        <div id="priceDetails"></div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                            Lanjut ke Pembayaran
+                        </button>
+                        <button type="button" onclick="cancelBooking()" class="px-6 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- My Bookings -->
+            <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Booking Saya</h3>
+                <div id="myBookings" class="space-y-4">
+                    <!-- Bookings will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- News Section -->
+        <div id="newsSection" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Berita Olahraga</h2>
+                <p class="text-gray-600">Berita terkini dan terpercaya dari dunia olahraga Indonesia</p>
+            </div>
+
+            <!-- News Categories -->
+            <div class="mb-6">
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterNews('all')" class="news-filter-btn bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition-colors">Semua</button>
+                    <button onclick="filterNews('sepakbola')" class="news-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">⚽ Sepakbola</button>
+                    <button onclick="filterNews('badminton')" class="news-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">🏸 Badminton</button>
+                    <button onclick="filterNews('basket')" class="news-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">🏀 Basket</button>
+                    <button onclick="filterNews('olimpiade')" class="news-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">🏅 Olimpiade</button>
+                    <button onclick="filterNews('sea-games')" class="news-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">🏆 SEA Games</button>
+                </div>
+            </div>
+
+            <!-- Add News Button -->
+            <div class="mb-6">
+                <button onclick="showAddNewsModal()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    ➕ Tambah Berita
+                </button>
+            </div>
+
+            <!-- Featured News -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Berita Utama</h3>
+                <div id="featuredNews" class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <!-- Featured news will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- News Grid -->
+            <div id="newsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- News will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Live Score Section -->
+        <div id="livescoreSection" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">🔴 Live Score</h2>
+                <p class="text-gray-600">Skor langsung pertandingan olahraga terkini</p>
+            </div>
+
+            <!-- Live Score Categories -->
+            <div class="mb-6">
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterLiveScore('all')" class="live-filter-btn bg-red-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-700 transition-colors">Semua</button>
+                    <button onclick="filterLiveScore('sepakbola')" class="live-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">⚽ Sepakbola</button>
+                    <button onclick="filterLiveScore('badminton')" class="live-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">🏸 Badminton</button>
+                    <button onclick="filterLiveScore('basket')" class="live-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">🏀 Basket</button>
+                    <button onclick="filterLiveScore('tenis')" class="live-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">🎾 Tenis</button>
+                    <button onclick="filterLiveScore('voli')" class="live-filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">🏐 Voli</button>
+                </div>
+            </div>
+
+            <!-- Add Live Score Button -->
+            <div class="mb-6">
+                <button onclick="showAddLiveScoreModal()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    ➕ Tambah Live Score
+                </button>
+            </div>
+
+            <!-- Live Matches -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">🔴 Sedang Berlangsung</h3>
+                <div id="liveMatches" class="space-y-4">
+                    <!-- Live matches will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Recent Results -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">📊 Hasil Terbaru</h3>
+                <div id="recentResults" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Recent results will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Section -->
+        <div id="scheduleSection" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">📅 Jadwal Pertandingan</h2>
+                <p class="text-gray-600">Jadwal lengkap pertandingan olahraga 2025</p>
+            </div>
+
+            <!-- Schedule Navigation -->
+            <div class="mb-6 flex flex-wrap gap-4 items-center">
+                <div class="flex gap-2">
+                    <button onclick="changeScheduleView('today')" class="schedule-view-btn bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">Hari Ini</button>
+                    <button onclick="changeScheduleView('week')" class="schedule-view-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors">Minggu Ini</button>
+                    <button onclick="changeScheduleView('month')" class="schedule-view-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors">Bulan Ini</button>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="previousPeriod()" class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">←</button>
+                    <span id="currentPeriod" class="px-4 py-2 font-medium text-gray-900">Januari 2025</span>
+                    <button onclick="nextPeriod()" class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">→</button>
+                </div>
+            </div>
+
+            <!-- Add Schedule Button -->
+            <div class="mb-6">
+                <button onclick="showAddScheduleModal()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    ➕ Tambah Jadwal
+                </button>
+            </div>
+
+            <!-- Calendar View -->
+            <div id="calendarView" class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div id="calendar" class="calendar-grid">
+                    <!-- Calendar will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Schedule List -->
+            <div id="scheduleList" class="space-y-4">
+                <!-- Schedule items will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div id="analyticsSection" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">📈 Analytics Dashboard</h2>
+                <p class="text-gray-600">Analisis mendalam aktivitas olahraga dan platform</p>
+            </div>
+
+            <!-- Analytics Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Total Pengguna</p>
+                            <p class="text-2xl font-bold text-gray-900">12,847</p>
+                            <p class="text-sm text-green-600">↗ +12% dari bulan lalu</p>
+                        </div>
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                            <span class="text-2xl">👥</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Event Aktif</p>
+                            <p class="text-2xl font-bold text-gray-900">156</p>
+                            <p class="text-sm text-green-600">↗ +8% dari bulan lalu</p>
+                        </div>
+                        <div class="p-3 rounded-full bg-green-100 text-green-600">
+                            <span class="text-2xl">🏆</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Total Booking</p>
+                            <p class="text-2xl font-bold text-gray-900">3,421</p>
+                            <p class="text-sm text-green-600">↗ +15% dari bulan lalu</p>
+                        </div>
+                        <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                            <span class="text-2xl">🏟️</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Revenue</p>
+                            <p class="text-2xl font-bold text-gray-900">Rp 2.1M</p>
+                            <p class="text-sm text-green-600">↗ +22% dari bulan lalu</p>
+                        </div>
+                        <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                            <span class="text-2xl">💰</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- User Growth Chart -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Pertumbuhan Pengguna</h3>
+                    <div class="h-64 flex items-end justify-between space-x-2">
+                        <div class="flex flex-col items-center">
+                            <div class="w-8 bg-blue-500 rounded-t" style="height: 60%"></div>
+                            <span class="text-xs text-gray-600 mt-2">Jan</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-8 bg-blue-500 rounded-t" style="height: 75%"></div>
+                            <span class="text-xs text-gray-600 mt-2">Feb</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-8 bg-blue-500 rounded-t" style="height: 85%"></div>
+                            <span class="text-xs text-gray-600 mt-2">Mar</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-8 bg-blue-500 rounded-t" style="height: 70%"></div>
+                            <span class="text-xs text-gray-600 mt-2">Apr</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-8 bg-blue-500 rounded-t" style="height: 90%"></div>
+                            <span class="text-xs text-gray-600 mt-2">Mei</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-8 bg-blue-500 rounded-t" style="height: 100%"></div>
+                            <span class="text-xs text-gray-600 mt-2">Jun</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popular Sports -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Olahraga Populer</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-3">⚽</span>
+                                <span class="font-medium">Futsal</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-24 bg-gray-200 rounded-full h-2 mr-3">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 85%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600">85%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-3">🏸</span>
+                                <span class="font-medium">Badminton</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-24 bg-gray-200 rounded-full h-2 mr-3">
+                                    <div class="bg-green-600 h-2 rounded-full" style="width: 72%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600">72%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-3">🎾</span>
+                                <span class="font-medium">Padel</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-24 bg-gray-200 rounded-full h-2 mr-3">
+                                    <div class="bg-purple-600 h-2 rounded-full" style="width: 68%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600">68%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-3">🏀</span>
+                                <span class="font-medium">Basket</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-24 bg-gray-200 rounded-full h-2 mr-3">
+                                    <div class="bg-orange-600 h-2 rounded-full" style="width: 45%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600">45%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Analytics -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Peak Hours -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Jam Sibuk Booking</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm">18:00 - 20:00</span>
+                            <div class="flex items-center">
+                                <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                                    <div class="bg-red-600 h-2 rounded-full" style="width: 95%"></div>
+                                </div>
+                                <span class="text-xs text-gray-600">95%</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm">16:00 - 18:00</span>
+                            <div class="flex items-center">
+                                <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                                    <div class="bg-orange-600 h-2 rounded-full" style="width: 78%"></div>
+                                </div>
+                                <span class="text-xs text-gray-600">78%</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm">20:00 - 22:00</span>
+                            <div class="flex items-center">
+                                <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                                    <div class="bg-yellow-600 h-2 rounded-full" style="width: 65%"></div>
+                                </div>
+                                <span class="text-xs text-gray-600">65%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue by Sport -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Revenue per Olahraga</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm">🎾 Padel</span>
+                            <span class="font-semibold text-green-600">Rp 850K</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm">⚽ Futsal</span>
+                            <span class="font-semibold text-blue-600">Rp 720K</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm">🏸 Badminton</span>
+                            <span class="font-semibold text-purple-600">Rp 380K</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm">🏀 Basket</span>
+                            <span class="font-semibold text-orange-600">Rp 150K</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Satisfaction -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Kepuasan Pengguna</h3>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-green-600 mb-2">4.8</div>
+                        <div class="text-yellow-400 text-xl mb-2">⭐⭐⭐⭐⭐</div>
+                        <p class="text-sm text-gray-600">Dari 2,847 review</p>
+                        <div class="mt-4 space-y-2">
+                            <div class="flex items-center text-sm">
+                                <span class="w-8">5⭐</span>
+                                <div class="flex-1 bg-gray-200 rounded-full h-2 mx-2">
+                                    <div class="bg-green-600 h-2 rounded-full" style="width: 78%"></div>
+                                </div>
+                                <span class="w-8 text-right">78%</span>
+                            </div>
+                            <div class="flex items-center text-sm">
+                                <span class="w-8">4⭐</span>
+                                <div class="flex-1 bg-gray-200 rounded-full h-2 mx-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 15%"></div>
+                                </div>
+                                <span class="w-8 text-right">15%</span>
+                            </div>
+                            <div class="flex items-center text-sm">
+                                <span class="w-8">3⭐</span>
+                                <div class="flex-1 bg-gray-200 rounded-full h-2 mx-2">
+                                    <div class="bg-yellow-600 h-2 rounded-full" style="width: 5%"></div>
+                                </div>
+                                <span class="w-8 text-right">5%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profileSection" class="hidden max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">👤 Profile Saya</h2>
+                <p class="text-gray-600">Kelola informasi akun dan preferensi Anda</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Profile Info -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Informasi Pribadi</h3>
+                        <form onsubmit="updateProfile(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                                    <input type="text" id="profileName" value="John Doe" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                    <input type="email" id="profileEmail" value="john@example.com" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nomor Telepon</label>
+                                    <input type="tel" id="profilePhone" value="081234567890" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Lahir</label>
+                                    <input type="date" id="profileBirthdate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
+                                <textarea id="profileAddress" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Masukkan alamat lengkap..."></textarea>
+                            </div>
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                                Simpan Perubahan
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Sports Preferences -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Preferensi Olahraga</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
+                                <span class="text-sm">⚽ Futsal</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
+                                <span class="text-sm">🏸 Badminton</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm">🏀 Basket</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
+                                <span class="text-sm">🎾 Padel</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm">🏐 Voli</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm">🎾 Tenis</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Change Password -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Ubah Password</h3>
+                        <form onsubmit="changePassword(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Password Lama</label>
+                                <input type="password" id="currentPassword" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Password Baru</label>
+                                <input type="password" id="newPassword" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Password Baru</label>
+                                <input type="password" id="confirmNewPassword" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                                Ubah Password
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Profile Stats -->
+                <div class="space-y-6">
+                    <!-- Profile Picture -->
+                    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                        <div class="w-24 h-24 bg-gray-300 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl">
+                            👤
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">John Doe</h4>
+                        <p class="text-sm text-gray-600 mb-4">Member sejak Januari 2024</p>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            Ubah Foto
+                        </button>
+                    </div>
+
+                    <!-- Activity Stats -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h4 class="font-semibold text-gray-900 mb-4">Statistik Aktivitas</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Total Booking</span>
+                                <span class="font-semibold">47</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Event Diikuti</span>
+                                <span class="font-semibold">12</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Jam Bermain</span>
+                                <span class="font-semibold">156 jam</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Olahraga Favorit</span>
+                                <span class="font-semibold">🎾 Padel</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Achievements -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h4 class="font-semibold text-gray-900 mb-4">Pencapaian</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">🏆</span>
+                                <div>
+                                    <p class="font-medium text-sm">Pemain Aktif</p>
+                                    <p class="text-xs text-gray-600">50+ booking</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">⭐</span>
+                                <div>
+                                    <p class="font-medium text-sm">Member Setia</p>
+                                    <p class="text-xs text-gray-600">1 tahun bergabung</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">🎯</span>
+                                <div>
+                                    <p class="font-medium text-sm">Konsisten</p>
+                                    <p class="text-xs text-gray-600">Booking rutin</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4 modal-mobile">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Pembayaran Booking</h3>
+            <div id="paymentDetails" class="mb-6">
+                <!-- Payment details will be populated by JavaScript -->
+            </div>
+            
+            <div class="mb-6">
+                <h4 class="font-semibold text-gray-900 mb-3">Pilih Metode Pembayaran</h4>
+                <div class="space-y-3">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="paymentMethod" value="gopay" class="mr-3">
+                        <div class="flex items-center justify-between w-full p-3 border rounded-lg hover:bg-gray-50">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-3">💚</span>
+                                <span class="font-medium">GoPay</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="paymentMethod" value="ovo" class="mr-3">
+                        <div class="flex items-center justify-between w-full p-3 border rounded-lg hover:bg-gray-50">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-3">💜</span>
+                                <span class="font-medium">OVO</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="paymentMethod" value="dana" class="mr-3">
+                        <div class="flex items-center justify-between w-full p-3 border rounded-lg hover:bg-gray-50">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-3">💙</span>
+                                <span class="font-medium">DANA</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="paymentMethod" value="bank" class="mr-3">
+                        <div class="flex items-center justify-between w-full p-3 border rounded-lg hover:bg-gray-50">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-3">🏦</span>
+                                <span class="font-medium">Transfer Bank</span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="processPayment()" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    Bayar Sekarang
+                </button>
+                <button onclick="closePaymentModal()" class="px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let events = [];
+        let bookings = [];
+        let news = [];
+        let liveScores = [];
+        let matchSchedule = [];
+        let currentScheduleView = 'today';
+        let currentDate = new Date();
+        let fields = {
+            futsal: ['Futsal Arena A', 'Futsal Arena B', 'Futsal Arena C'],
+            badminton: ['Court Badminton 1', 'Court Badminton 2', 'Court Badminton 3'],
+            basket: ['Basketball Court 1', 'Basketball Court 2'],
+            tenis: ['Tennis Court A', 'Tennis Court B'],
+            voli: ['Volleyball Court 1', 'Volleyball Court 2'],
+            padel: ['Padel Court Jakarta 1', 'Padel Court Jakarta 2', 'Padel Court Jakarta 3', 'Padel Court Senayan', 'Padel Court PIK', 'Padel Court Kemang']
+        };
+
+        let fieldPrices = {
+            'Padel Court Jakarta 1': { price: 250000, location: 'Jakarta Pusat', facilities: ['AC', 'Shower', 'Parking', 'Cafeteria'] },
+            'Padel Court Jakarta 2': { price: 280000, location: 'Jakarta Selatan', facilities: ['AC', 'Shower', 'Parking', 'Pro Shop'] },
+            'Padel Court Jakarta 3': { price: 230000, location: 'Jakarta Timur', facilities: ['AC', 'Shower', 'Parking'] },
+            'Padel Court Senayan': { price: 350000, location: 'Jakarta Pusat - Senayan', facilities: ['AC', 'Shower', 'Parking', 'Cafeteria', 'Pro Shop', 'Locker'] },
+            'Padel Court PIK': { price: 320000, location: 'Jakarta Utara - PIK', facilities: ['AC', 'Shower', 'Parking', 'Cafeteria', 'Sea View'] },
+            'Padel Court Kemang': { price: 300000, location: 'Jakarta Selatan - Kemang', facilities: ['AC', 'Shower', 'Parking', 'Cafeteria', 'Garden View'] },
+            'Futsal Arena A': { price: 150000, location: 'Jakarta Selatan', facilities: ['AC', 'Shower', 'Parking'] },
+            'Futsal Arena B': { price: 180000, location: 'Jakarta Pusat', facilities: ['AC', 'Shower', 'Parking', 'Cafeteria'] },
+            'Court Badminton 1': { price: 80000, location: 'Jakarta Utara', facilities: ['AC', 'Shower'] },
+            'Basketball Court 1': { price: 120000, location: 'Jakarta Barat', facilities: ['AC', 'Parking'] }
+        };
+
+        // Initialize sample data
+        function initializeData() {
+            // Sample events
+            events = [
+                { id: 1, name: 'Jakarta Marathon 2025', category: 'lari', date: '2025-02-15', location: 'Jakarta', description: 'Marathon terbesar di Indonesia dengan rute scenic melalui landmark Jakarta', price: 150000, participants: 5000 },
+                { id: 2, name: 'Indonesia Open Badminton', category: 'badminton', date: '2025-06-15', location: 'Jakarta', description: 'Turnamen badminton internasional dengan pemain terbaik dunia', price: 75000, participants: 200 },
+                { id: 3, name: 'Bali Cycling Festival', category: 'sepeda', date: '2025-03-20', location: 'Bali', description: 'Festival sepeda dengan pemandangan alam Bali yang menakjubkan', price: 200000, participants: 1500 },
+                { id: 4, name: 'Aquathlon Ancol', category: 'renang', date: '2025-04-10', location: 'Jakarta', description: 'Kombinasi renang dan lari di pantai Ancol', price: 125000, participants: 800 },
+                { id: 5, name: 'Liga Futsal Nusantara', category: 'sepakbola', date: '2025-05-01', location: 'Surabaya', description: 'Liga futsal antar kota dengan hadiah jutaan rupiah', price: 300000, participants: 64 }
+            ];
+
+            // Sample news
+            news = [
+                { id: 1, title: 'Indonesia Dominasi SEA Games 2025', category: 'sea-games', content: 'Tim Indonesia berhasil meraih 45 medali emas di SEA Games 2025 yang diselenggarakan di Thailand. Prestasi gemilang ini menjadikan Indonesia sebagai juara umum untuk ketiga kalinya berturut-turut.', publishDate: '2025-01-15', author: 'Tim OlahragaYuk', image: '🏆', featured: true },
+                { id: 2, title: 'Liga 1 2025 Pecahkan Rekor Penonton', category: 'sepakbola', content: 'Musim Liga 1 2025 mencatat rekor penonton tertinggi dengan rata-rata 25.000 penonton per pertandingan. Antusiasme tinggi dari suporter menjadi kunci kesuksesan ini.', publishDate: '2025-01-14', author: 'Reporter Olahraga', image: '⚽' },
+                { id: 3, title: 'Anthony Ginting Juara Indonesia Masters', category: 'badminton', content: 'Anthony Sinisuka Ginting berhasil menjuarai Indonesia Masters 2025 setelah mengalahkan Viktor Axelsen di final dengan skor 21-18, 21-15.', publishDate: '2025-01-13', author: 'Badminton Indonesia', image: '🏸' },
+                { id: 4, title: 'Timnas Basket Lolos ke FIBA World Cup', category: 'basket', content: 'Timnas basket Indonesia berhasil lolos ke FIBA World Cup 2025 setelah finis di posisi kedua pada kualifikasi zona Asia.', publishDate: '2025-01-12', author: 'Basketball Indonesia', image: '🏀' }
+            ];
+
+            // Live Scores 2025 - Comprehensive
+            liveScores = [
+                { id: 1, sport: 'sepakbola', match: 'Persija vs Persib', score: '2-1', status: 'live', time: '75\'', date: '2025-01-15', competition: 'Liga 1 Indonesia' },
+                { id: 2, sport: 'badminton', match: 'Anthony Ginting vs Viktor Axelsen', score: '21-18, 15-12', status: 'live', time: 'Set 2', date: '2025-01-16', competition: 'Indonesia Masters' },
+                { id: 3, sport: 'basket', match: 'Satria Muda vs Pelita Jaya', score: '89-76', status: 'finished', time: 'FT', date: '2025-01-17', competition: 'IBL 2025' },
+                { id: 4, sport: 'sepakbola', match: 'Arema FC vs Bali United', score: '1-0', status: 'live', time: '62\'', date: '2025-01-15', competition: 'Liga 1 Indonesia' },
+                { id: 5, sport: 'voli', match: 'Jakarta BNI vs Surabaya Bhayangkara', score: '2-1', status: 'live', time: 'Set 4', date: '2025-01-16', competition: 'Proliga 2025' },
+                { id: 6, sport: 'tenis', match: 'Aldila Sutjiadi vs Beatriz Haddad', score: '6-4, 3-2', status: 'live', time: 'Set 2', date: '2025-01-17', competition: 'WTA Jakarta' }
+            ];
+
+            // Match Schedule 2025 - Complete Year Schedule
+            matchSchedule = [
+                { id: 1, sport: 'sepakbola', match: 'Liga 1 Indonesia Kick-off', date: '2025-01-05', time: '19:00', location: 'Jakarta', status: 'upcoming' },
+                { id: 2, sport: 'basket', match: 'IBL Season Opener', date: '2025-01-10', time: '20:00', location: 'Jakarta', status: 'upcoming' },
+                { id: 3, sport: 'badminton', match: 'Indonesia Masters', date: '2025-01-15', time: '14:00', location: 'Jakarta', status: 'upcoming' },
+                { id: 4, sport: 'sepakbola', match: 'Persija vs Persib - El Clasico', date: '2025-02-14', time: '19:00', location: 'Jakarta', status: 'upcoming' },
+                { id: 5, sport: 'voli', match: 'Proliga Final Four', date: '2025-03-20', time: '16:00', location: 'Surabaya', status: 'upcoming' },
+                { id: 6, sport: 'tenis', match: 'WTA Jakarta Open', date: '2025-04-15', time: '10:00', location: 'Jakarta', status: 'upcoming' },
+                { id: 7, sport: 'sepakbola', match: 'Piala Indonesia Final', date: '2025-05-17', time: '19:30', location: 'Jakarta', status: 'upcoming' },
+                { id: 8, sport: 'badminton', match: 'Indonesia Open', date: '2025-06-10', time: '13:00', location: 'Jakarta', status: 'upcoming' },
+                { id: 9, sport: 'basket', match: 'IBL Playoffs', date: '2025-07-05', time: '19:00', location: 'Jakarta', status: 'upcoming' },
+                { id: 10, sport: 'sepakbola', match: 'SEA Games Football', date: '2025-08-15', time: '20:00', location: 'Thailand', status: 'upcoming' }
+            ];
+
+            // Sample bookings
+            bookings = [
+                { id: 1, fieldName: 'Padel Court Senayan', sport: 'padel', date: '2025-01-20', time: '19:00', duration: 2, status: 'confirmed', totalPrice: 700000 },
+                { id: 2, fieldName: 'Futsal Arena A', sport: 'futsal', date: '2025-01-21', time: '16:00', duration: 1, status: 'pending', totalPrice: 150000 }
+            ];
+
+            updateDashboard();
+            renderEvents();
+            renderNews();
+            renderLiveScores();
+            renderSchedule();
+            renderMyBookings();
+        }
+
+        // Navigation functions
+        function showSection(sectionName) {
+            // Hide all sections
+            const sections = ['dashboard', 'events', 'booking', 'news', 'livescore', 'schedule', 'analytics', 'profile'];
+            sections.forEach(section => {
+                const element = document.getElementById(section + 'Section');
+                if (element) {
+                    element.classList.add('hidden');
+                }
+            });
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionName + 'Section');
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
+            
+            // Update navigation active state
+            document.querySelectorAll('.nav-btn, .mobile-nav-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'bg-opacity-20');
+            });
+        }
+
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Authentication functions
+        function login(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Simple login simulation
+            currentUser = { email: email, name: 'User' };
+            
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            showNotification('success', 'Login berhasil!');
+            showSection('dashboard');
+        }
+
+        function register(event) {
+            event.preventDefault();
+            showNotification('success', 'Registrasi berhasil! Silakan login.');
+            showLogin();
+        }
+
+        function forgotPassword(event) {
+            event.preventDefault();
+            showNotification('success', 'Link reset password telah dikirim ke email Anda.');
+            showLogin();
+        }
+
+        function showLogin() {
+            document.getElementById('registerSection').classList.add('hidden');
+            document.getElementById('forgotPasswordSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+        }
+
+        function showRegister() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('forgotPasswordSection').classList.add('hidden');
+            document.getElementById('registerSection').classList.remove('hidden');
+        }
+
+        function showForgotPassword() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('registerSection').classList.add('hidden');
+            document.getElementById('forgotPasswordSection').classList.remove('hidden');
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            showNotification('info', 'Anda telah logout.');
+        }
+
+        // Dashboard functions
+        function updateDashboard() {
+            document.getElementById('totalEvents').textContent = events.length;
+            document.getElementById('activeBookings').textContent = bookings.filter(b => b.status === 'confirmed').length;
+            document.getElementById('totalNews').textContent = news.length;
+            document.getElementById('liveMatches').textContent = liveScores.filter(s => s.status === 'live').length;
+            
+            // Update dashboard live scores
+            const dashboardLiveScores = document.getElementById('dashboardLiveScores');
+            const liveMatches = liveScores.filter(score => score.status === 'live').slice(0, 3);
+            
+            dashboardLiveScores.innerHTML = liveMatches.map(match => `
+                <div class="flex justify-between items-center p-3 bg-red-50 border border-red-200 rounded-lg live-pulse">
+                    <div>
+                        <p class="font-medium text-sm">${match.match}</p>
+                        <p class="text-xs text-gray-600">${match.competition}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-red-600">${match.score}</p>
+                        <p class="text-xs text-red-500">${match.time}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Events functions
+        function renderEvents() {
+            const eventsGrid = document.getElementById('eventsGrid');
+            eventsGrid.innerHTML = events.map(event => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover fade-in">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-2xl">${getCategoryIcon(event.category)}</span>
+                            <span class="text-sm text-gray-500">${formatDate(event.date)}</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">${event.name}</h3>
+                        <p class="text-gray-600 text-sm mb-3">${event.description}</p>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-500">📍 ${event.location}</span>
+                            <span class="text-sm text-gray-500">👥 ${event.participants} peserta</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-lg font-bold text-green-600">Rp ${event.price.toLocaleString()}</span>
+                            <button onclick="registerEvent(${event.id})" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                Daftar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterEvents(category) {
+            // Update filter buttons
+            document.querySelectorAll('.event-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            event.target.classList.add('bg-blue-600', 'text-white');
+            
+            // Filter events
+            const filteredEvents = category === 'all' ? events : events.filter(e => e.category === category);
+            const eventsGrid = document.getElementById('eventsGrid');
+            eventsGrid.innerHTML = filteredEvents.map(event => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover fade-in">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-2xl">${getCategoryIcon(event.category)}</span>
+                            <span class="text-sm text-gray-500">${formatDate(event.date)}</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">${event.name}</h3>
+                        <p class="text-gray-600 text-sm mb-3">${event.description}</p>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-500">📍 ${event.location}</span>
+                            <span class="text-sm text-gray-500">👥 ${event.participants} peserta</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-lg font-bold text-green-600">Rp ${event.price.toLocaleString()}</span>
+                            <button onclick="registerEvent(${event.id})" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                Daftar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function registerEvent(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (event) {
+                showNotification('success', `Berhasil mendaftar event: ${event.name}`);
+            }
+        }
+
+        // Booking functions
+        function selectSport(sport) {
+            // Update sport button active state
+            document.querySelectorAll('.sport-btn').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'bg-blue-50');
+            });
+            event.target.closest('.sport-btn').classList.add('border-blue-500', 'bg-blue-50');
+            
+            // Show booking form
+            document.getElementById('bookingForm').classList.remove('hidden');
+            document.getElementById('selectedSportName').textContent = sport.charAt(0).toUpperCase() + sport.slice(1);
+            
+            // Populate field options
+            const fieldSelect = document.getElementById('fieldSelect');
+            fieldSelect.innerHTML = '<option value="">Pilih lapangan...</option>';
+            fields[sport].forEach(field => {
+                fieldSelect.innerHTML += `<option value="${field}">${field}</option>`;
+            });
+            
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('bookingDate').min = today;
+        }
+
+        function submitBooking(event) {
+            event.preventDefault();
+            
+            const fieldName = document.getElementById('fieldSelect').value;
+            const date = document.getElementById('bookingDate').value;
+            const startTime = document.getElementById('startTime').value;
+            const duration = parseInt(document.getElementById('duration').value);
+            
+            if (!fieldName || !date || !startTime || !duration) {
+                showNotification('error', 'Mohon lengkapi semua field!');
+                return;
+            }
+            
+            const fieldInfo = fieldPrices[fieldName];
+            const totalPrice = fieldInfo.price * duration;
+            
+            // Show payment modal
+            showPaymentModal({
+                fieldName,
+                date,
+                startTime,
+                duration,
+                totalPrice,
+                fieldInfo
+            });
+        }
+
+        function showPaymentModal(bookingData) {
+            const modal = document.getElementById('paymentModal');
+            const paymentDetails = document.getElementById('paymentDetails');
+            
+            paymentDetails.innerHTML = `
+                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                    <h4 class="font-semibold text-gray-900 mb-2">Detail Booking</h4>
+                    <div class="space-y-1 text-sm">
+                        <div class="flex justify-between">
+                            <span>Lapangan:</span>
+                            <span class="font-medium">${bookingData.fieldName}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Tanggal:</span>
+                            <span class="font-medium">${formatDate(bookingData.date)}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Waktu:</span>
+                            <span class="font-medium">${bookingData.startTime} (${bookingData.duration} jam)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Lokasi:</span>
+                            <span class="font-medium">${bookingData.fieldInfo.location}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold text-gray-900">Total Pembayaran:</span>
+                        <span class="text-xl font-bold text-blue-600">Rp ${bookingData.totalPrice.toLocaleString()}</span>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+            modal.bookingData = bookingData;
+        }
+
+        function processPayment() {
+            const selectedPayment = document.querySelector('input[name="paymentMethod"]:checked');
+            if (!selectedPayment) {
+                showNotification('error', 'Pilih metode pembayaran!');
+                return;
+            }
+            
+            const modal = document.getElementById('paymentModal');
+            const bookingData = modal.bookingData;
+            
+            // Add booking to list
+            const newBooking = {
+                id: bookings.length + 1,
+                fieldName: bookingData.fieldName,
+                sport: document.getElementById('selectedSportName').textContent.toLowerCase(),
+                date: bookingData.date,
+                time: bookingData.startTime,
+                duration: bookingData.duration,
+                status: 'confirmed',
+                totalPrice: bookingData.totalPrice,
+                paymentMethod: selectedPayment.value
+            };
+            
+            bookings.push(newBooking);
+            
+            showNotification('success', 'Pembayaran berhasil! Booking dikonfirmasi.');
+            closePaymentModal();
+            cancelBooking();
+            renderMyBookings();
+            updateDashboard();
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+        }
+
+        function cancelBooking() {
+            document.getElementById('bookingForm').classList.add('hidden');
+            document.querySelectorAll('.sport-btn').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'bg-blue-50');
+            });
+        }
+
+        function renderMyBookings() {
+            const myBookings = document.getElementById('myBookings');
+            if (bookings.length === 0) {
+                myBookings.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <span class="text-4xl mb-4 block">🏟️</span>
+                        <p>Belum ada booking</p>
+                        <p class="text-sm mt-2">Pilih olahraga di atas untuk mulai booking</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            myBookings.innerHTML = bookings.map(booking => `
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <p class="font-medium">${booking.fieldName}</p>
+                        <p class="text-sm text-gray-600">${formatDate(booking.date)} • ${booking.time} (${booking.duration} jam)</p>
+                        <p class="text-sm text-gray-600">Rp ${booking.totalPrice.toLocaleString()}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${booking.status === 'confirmed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                            ${booking.status === 'confirmed' ? 'Dikonfirmasi' : 'Pending'}
+                        </span>
+                        <div class="mt-2">
+                            <button onclick="cancelBookingItem(${booking.id})" class="text-red-600 hover:text-red-800 text-sm">Batal</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function cancelBookingItem(bookingId) {
+            if (confirm('Yakin ingin membatalkan booking ini?')) {
+                bookings = bookings.filter(b => b.id !== bookingId);
+                renderMyBookings();
+                updateDashboard();
+                showNotification('info', 'Booking dibatalkan');
+            }
+        }
+
+        // News functions
+        function renderNews() {
+            const newsGrid = document.getElementById('newsGrid');
+            const featuredNews = document.getElementById('featuredNews');
+            
+            // Render featured news
+            const featured = news.find(n => n.featured);
+            if (featured) {
+                featuredNews.innerHTML = `
+                    <div class="md:flex">
+                        <div class="md:w-1/3 bg-gray-200 flex items-center justify-center text-6xl">
+                            ${featured.image}
+                        </div>
+                        <div class="md:w-2/3 p-6">
+                            <div class="flex items-center mb-2">
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full mr-2">${getCategoryName(featured.category)}</span>
+                                <span class="text-xs text-gray-500">${formatDate(featured.publishDate)}</span>
+                            </div>
+                            <h2 class="text-2xl font-bold text-gray-900 mb-3">${featured.title}</h2>
+                            <p class="text-gray-600 mb-4">${featured.content.substring(0, 200)}...</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-500">By ${featured.author}</span>
+                                <button class="text-blue-600 hover:text-blue-800 font-medium">Baca Selengkapnya</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Render news grid (excluding featured)
+            const regularNews = news.filter(n => !n.featured);
+            newsGrid.innerHTML = regularNews.map(article => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                    <div class="bg-gray-200 h-48 flex items-center justify-center text-4xl">
+                        ${article.image}
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <span class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full mr-2">${getCategoryName(article.category)}</span>
+                            <span class="text-xs text-gray-500">${formatDate(article.publishDate)}</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">${article.title}</h3>
+                        <p class="text-gray-600 text-sm mb-4">${article.content.substring(0, 100)}...</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500">By ${article.author}</span>
+                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Baca</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterNews(category) {
+            // Update filter buttons
+            document.querySelectorAll('.news-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            event.target.classList.add('bg-blue-600', 'text-white');
+            
+            // Filter news
+            const filteredNews = category === 'all' ? news.filter(n => !n.featured) : news.filter(n => n.category === category && !n.featured);
+            const newsGrid = document.getElementById('newsGrid');
+            newsGrid.innerHTML = filteredNews.map(article => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                    <div class="bg-gray-200 h-48 flex items-center justify-center text-4xl">
+                        ${article.image}
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <span class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full mr-2">${getCategoryName(article.category)}</span>
+                            <span class="text-xs text-gray-500">${formatDate(article.publishDate)}</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">${article.title}</h3>
+                        <p class="text-gray-600 text-sm mb-4">${article.content.substring(0, 100)}...</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500">By ${article.author}</span>
+                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Baca</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Live Score functions
+        function renderLiveScores() {
+            const liveMatches = document.getElementById('liveMatches');
+            const recentResults = document.getElementById('recentResults');
+            
+            // Render live matches
+            const live = liveScores.filter(score => score.status === 'live');
+            liveMatches.innerHTML = live.map(match => `
+                <div class="bg-white rounded-lg shadow-md p-6 match-card live">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">${getSportIcon(match.sport)}</span>
+                            <div>
+                                <h3 class="font-semibold text-gray-900">${match.match}</h3>
+                                <p class="text-sm text-gray-600">${match.competition}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="flex items-center mb-1">
+                                <span class="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></span>
+                                <span class="text-xs font-medium text-red-600 uppercase">LIVE</span>
+                            </div>
+                            <p class="text-sm text-gray-500">${match.time}</p>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-gray-900">${match.score}</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Render recent results
+            const finished = liveScores.filter(score => score.status === 'finished');
+            recentResults.innerHTML = finished.map(match => `
+                <div class="bg-white rounded-lg shadow-md p-4 match-card finished">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xl">${getSportIcon(match.sport)}</span>
+                        <span class="text-xs bg-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9864ecca016b40f0',t:'MTc1OTA4MDE2OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
